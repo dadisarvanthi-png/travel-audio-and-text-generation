@@ -1,8 +1,9 @@
 import base64
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from google import genai
 import requests
@@ -11,6 +12,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+FRONTEND_DIRECTORY = Path(__file__).resolve().parents[1] / "Frontend"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 MURF_API_KEY = os.getenv("MURF_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -115,6 +117,16 @@ def generate_audio_guide():
         app.logger.exception("Audio generation failed")
         result["audioError"] = f"Audio generation failed: {error}"
     return jsonify(result)
+
+
+@app.get("/")
+def serve_frontend():
+    return send_from_directory(FRONTEND_DIRECTORY, "index.html")
+
+
+@app.get("/<path:asset_path>")
+def serve_frontend_asset(asset_path):
+    return send_from_directory(FRONTEND_DIRECTORY, asset_path)
 
 
 if __name__ == "__main__":

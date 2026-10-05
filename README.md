@@ -82,6 +82,18 @@ The frontend sends a `POST` request to `http://127.0.0.1:5000/generate-audio-gui
 
 `answerType` must be `Summary` or `Detailed`. A successful response includes the generated `description` and, when available, base64-encoded MP3 audio in `audioBase64`.
 
+## Deploy to Render
+
+The repository includes a Render Blueprint in `render.yaml`. It deploys the frontend and Flask API together as one Python web service, so the browser can call the API on the same origin.
+
+1. Push this repository to GitHub.
+2. In Render, choose **New → Blueprint**, connect GitHub, and select this repository.
+3. Review the service named `travel-guide`. Render reads the build/start commands from `render.yaml`.
+4. Enter `GEMINI_API_KEY` and `MURF_API_KEY` in Render when prompted, then create the service.
+5. Open the service's public URL when the deployment finishes.
+
+Do not put secrets in `render.yaml`, commit `Backend/.env`, or paste keys into source files. Add production keys only in Render's environment-variable settings. The Blueprint selects Render's free plan; free services can spin down when idle, so the first request after inactivity may take longer.
+
 ## Troubleshooting
 
 - **Cannot connect to the backend:** confirm `py app.py` is still running in the Backend terminal.
